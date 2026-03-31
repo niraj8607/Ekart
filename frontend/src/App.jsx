@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react' // 👈 useEffect import add kiya
+import React, { useEffect } from 'react'
 import { createBrowserRouter, RouterProvider } from 'react-router-dom'
 import Navbar from './components/ui/Navbar'
 import Home from './pages/Home'
@@ -6,10 +6,12 @@ import Signup from './pages/Signup'
 import Login from './pages/Login'
 import Verify from './pages/Verify'
 import VerifyEmail from './VerifyEmail'
-// import { CardFooter } from './components/ui/card' // Iski zaroorat nahi thi yahan
+
 import { useDispatch } from 'react-redux'
 import { setUser } from '@/redux/userSlice' 
 import Profile from './pages/Profile'
+import Products from './pages/Products'
+import Cart from './pages/Cart'
 
 const router = createBrowserRouter([
   {
@@ -35,6 +37,14 @@ const router = createBrowserRouter([
   {
     path : "/profile/:userId",
     element : <><Navbar/><Profile/></>
+  },
+   {
+    path : "/products",
+    element : <><Navbar/><Products/></>
+  },
+  {
+    path : "/cart",
+    element : <><Navbar/><Cart/></>
   }
 ]);
 
