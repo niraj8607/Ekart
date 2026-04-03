@@ -4,6 +4,7 @@ const app = express();
 import connectDb from "./config/db.js";
 import userRoute from "./routes/userRoute.js";
 import productRoute from "./routes/productRoute.js"
+import cartRoute from "./routes/cartRoute.js"
 import cors from "cors"
 const PORT=process.env.PORT || 3000 ;
 
@@ -17,6 +18,7 @@ app.use(cors({
 //Router
 app.use("/api/v1/user",userRoute);
 app.use("/api/v1/product", productRoute);
+app.use("/api/v1/cart",cartRoute)
 
 //http://localhost:808/api/vi/user/register
 app.get("/",(req, res)=>{
