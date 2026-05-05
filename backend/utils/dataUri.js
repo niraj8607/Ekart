@@ -1,4 +1,5 @@
-import DataUriParser from "dataUri/parser"
+// import DataUriParser from "dataUri/parser"
+import DataUriParser from "datauri/parser.js"
 import path from "path"
 
 const parser = new DataUriParser()
