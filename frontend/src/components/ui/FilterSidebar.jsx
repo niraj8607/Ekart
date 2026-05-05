@@ -22,7 +22,6 @@ export default function FilterSidebar({ onFilterChange }) {
   const MAX_LIMIT = 999999;
   const STEP = 1000;
 
-  // Jab bhi state change ho, parent (Products.jsx) ko data bhejo
   useEffect(() => {
     if (onFilterChange) {
       onFilterChange({
@@ -52,33 +51,33 @@ export default function FilterSidebar({ onFilterChange }) {
     setPriceRange({ min: MIN_LIMIT, max: MAX_LIMIT });
   };
 
-  // Helper function for dynamic slider background fill
   const getBackgroundSize = (value) => {
     return { backgroundSize: `${((value - MIN_LIMIT) * 100) / (MAX_LIMIT - MIN_LIMIT)}% 100%` };
   };
 
   return (
-    // Width reduced to max-w-[260px] and padding reduced to p-5 for a more compact look
-    <div className="w-full max-w-[260px] space-y-6 p-5 bg-gray-50/50 rounded-xl border border-gray-200 shadow-sm">
+    // 🌟 CSS CHANGED: Width aur choti (max-w-[220px]), padding (p-4), aur spacing (space-y-4)
+    <div className="w-full max-w-[220px] space-y-4 p-4 bg-gray-50/50 rounded-xl border border-gray-200 shadow-sm">
       
       {/* Search Field */}
       <div>
+        {/* 🌟 CSS CHANGED: Height choti (h-8) aur text (text-xs) */}
         <Input 
           placeholder="Search..." 
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="focus-visible:ring-blue-500 bg-white h-9 text-sm" 
+          className="focus-visible:ring-blue-500 bg-white h-8 text-xs" 
         />
       </div>
 
       {/* Category Section */}
       <div>
-        <h3 className="mb-3 text-base font-bold text-gray-900">Category</h3>
-        <div className="flex flex-col gap-2">
+        <h3 className="mb-2 text-sm font-bold text-gray-900">Category</h3>
+        <div className="flex flex-col gap-1.5">
           {categories.map((category) => (
             <label
               key={category}
-              className="flex cursor-pointer items-center gap-2 text-sm text-gray-700 transition-colors hover:text-pink-600"
+              className="flex cursor-pointer items-center gap-2 text-xs text-gray-700 transition-colors hover:text-pink-600"
             >
               <input
                 type="radio"
@@ -86,7 +85,7 @@ export default function FilterSidebar({ onFilterChange }) {
                 value={category}
                 checked={selectedCategory === category}
                 onChange={() => setSelectedCategory(category)}
-                className="h-3.5 w-3.5 cursor-pointer text-pink-600 accent-pink-600 focus:ring-pink-500"
+                className="h-3 w-3 cursor-pointer text-pink-600 accent-pink-600 focus:ring-pink-500"
               />
               {category}
             </label>
@@ -96,48 +95,46 @@ export default function FilterSidebar({ onFilterChange }) {
 
       {/* Brand Dropdown Section */}
       <div>
-        <h3 className="mb-2 text-base font-bold text-gray-900">Brand</h3>
+        <h3 className="mb-1.5 text-sm font-bold text-gray-900">Brand</h3>
         <Select value={brand} onValueChange={setBrand}>
-          <SelectTrigger className="w-full bg-white border-gray-300 focus:ring-gray-300 h-9 text-sm">
+          <SelectTrigger className="w-full bg-white border-gray-300 focus:ring-gray-300 h-8 text-xs">
             <SelectValue placeholder="Select Brand" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="ALL">ALL</SelectItem>
-            <SelectItem value="Apple">Apple</SelectItem>
-            <SelectItem value="Asus">Asus</SelectItem>
-            <SelectItem value="boAt">boAt</SelectItem>
+            <SelectItem value="ALL" className="text-xs">ALL</SelectItem>
+            <SelectItem value="Apple" className="text-xs">Apple</SelectItem>
+            <SelectItem value="Asus" className="text-xs">Asus</SelectItem>
+            <SelectItem value="boAt" className="text-xs">boAt</SelectItem>
           </SelectContent>
         </Select>
       </div>
 
       {/* Price Range Section */}
-      <div className="space-y-4">
-        <h3 className="text-base font-bold text-gray-900">Price Range</h3>
-        <p className="text-xs font-semibold text-gray-600">
+      <div className="space-y-3">
+        <h3 className="text-sm font-bold text-gray-900">Price Range</h3>
+        <p className="text-[10px] font-semibold text-gray-600">
           Range: ₹{priceRange.min.toLocaleString('en-IN')} - ₹{priceRange.max.toLocaleString('en-IN')}
         </p>
 
-        <div className="flex items-center gap-2 pt-1">
+        <div className="flex items-center gap-2 pt-0.5">
           <Input
             type="number"
             placeholder="Min"
             value={priceRange.min}
             onChange={(e) => setPriceRange({ ...priceRange, min: Number(e.target.value) })}
-            className="w-full bg-white focus-visible:ring-blue-500 h-8 text-xs"
+            className="w-full bg-white focus-visible:ring-blue-500 h-7 text-[10px]"
           />
           <Input
             type="number"
             placeholder="Max"
             value={priceRange.max}
             onChange={(e) => setPriceRange({ ...priceRange, max: Number(e.target.value) })}
-            className="w-full bg-white focus-visible:ring-blue-500 h-8 text-xs"
+            className="w-full bg-white focus-visible:ring-blue-500 h-7 text-[10px]"
           />
         </div>
 
-        {/* Working Sliders with Dynamic Background Fill */}
-        <div className="space-y-5 pt-2">
-          
-          {/* Min Slider */}
+        {/* Working Sliders */}
+        <div className="space-y-4 pt-1">
           <div className="relative w-full">
             <input
               type="range"
@@ -151,11 +148,10 @@ export default function FilterSidebar({ onFilterChange }) {
                 backgroundImage: 'linear-gradient(#2563eb, #2563eb)', 
                 backgroundRepeat: 'no-repeat'
               }}
-              className="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
+              className="w-full h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
             />
           </div>
 
-          {/* Max Slider */}
           <div className="relative w-full">
             <input
               type="range"
@@ -169,18 +165,18 @@ export default function FilterSidebar({ onFilterChange }) {
                 backgroundImage: 'linear-gradient(#2563eb, #2563eb)', 
                 backgroundRepeat: 'no-repeat'
               }}
-              className="w-full h-1.5 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
+              className="w-full h-1 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
             />
           </div>
-
         </div>
       </div>
 
       {/* Reset Filters Button */}
-      <div className="pt-2">
+      <div className="pt-1">
+        {/* 🌟 CSS CHANGED: Button height h-8 aur text-xs */}
         <Button 
           onClick={handleReset} 
-          className="w-full bg-pink-600 hover:bg-pink-700 text-white font-semibold py-4 text-sm shadow-sm transition-all"
+          className="w-full h-8 bg-pink-600 hover:bg-pink-700 text-white font-medium text-xs shadow-sm transition-all"
         >
           Reset Filters
         </Button>

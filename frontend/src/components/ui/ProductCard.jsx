@@ -3,27 +3,62 @@ import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ShoppingCart, Heart, Star } from "lucide-react";
 import { toast } from "sonner";
+import axios from "axios";
+import { Link } from "react-router-dom"; 
+import { useDispatch, useSelector } from "react-redux"; 
+import { addToCart } from "@/redux/cartSlice"; 
 
 export default function ProductCard({ product = {} }) {
-  // 1. DYNAMIC KEYS MATCHED WITH YOUR POSTMAN RESPONSE
+  const dispatch = useDispatch();
+  const { user } = useSelector((store) => store?.user || {}); 
+
+  const id = product._id || product.id;
   const name = product.productName || "Unknown Product";
   const price = product.productPrice || 0;
   const category = product.category || "General";
   
-  // 2. IMAGE HANDLING: Aapka productImg ek array hai, toh hum first image [0] ka url nikalenge
-  let imageUrl = "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=800&auto=format&fit=crop"; // Default image
-  
+  let imageUrl = "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=800&auto=format&fit=crop"; 
   if (product.productImg && product.productImg.length > 0) {
-    imageUrl = product.productImg[0].url; // Cloudinary URL yahan se aayega
+    imageUrl = product.productImg[0].url; 
   }
 
-  // Original price agar backend se nahi aa raha, toh UI ke liye dummy discount dikha dete hain 
-  // (Aap chahein toh isko backend me actual MRP add karke update kar sakte hain)
-  const originalPrice = price + (price * 0.15); // Dummy 15% markup for UI
+  const originalPrice = price + (price * 0.15); 
   const discount = Math.round(((originalPrice - price) / originalPrice) * 100);
 
-  const handleAddToCart = () => {
-    toast.success(`${name} added to cart! 🛍️`);
+  const handleRealAddToCart = async () => {
+    const accessToken = localStorage.getItem("accessToken") || localStorage.getItem("token"); 
+    
+    if (!accessToken) {
+      toast.error("Please login to add items to cart!");
+      return;
+    }
+
+    try {
+      const res = await axios.post(
+        `http://localhost:8080/api/v1/cart/add`, 
+        { 
+          productId: id,
+          userId: user?._id 
+        }, 
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`
+          }
+        }
+      );
+      
+      if (res.data.success) {
+        toast.success("Product added to Cart 🛍️");
+        
+        dispatch(addToCart({
+          _id: id, name, price, originalPrice, image: imageUrl, category, quantity: 1
+        }));
+      }
+
+    } catch (error) {
+      console.error(error);
+      toast.error(error.response?.data?.message || "Failed to add product to cart");
+    }
   };
 
   const handleWishlist = (e) => {
@@ -32,65 +67,49 @@ export default function ProductCard({ product = {} }) {
   };
 
   return (
-    <Card className="group relative w-full overflow-hidden rounded-2xl border-none bg-white shadow-md transition-all duration-300 hover:-translate-y-2 hover:shadow-2xl flex flex-col justify-between">
+    
+    <Card className="group relative w-full h-[300px] overflow-hidden rounded-xl border-none bg-white shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1 flex flex-col justify-between">
       
-      {/* 1. Product Image Section */}
-      <div className="relative aspect-square overflow-hidden bg-white p-4">
-        <img
-          src={imageUrl}
-          alt={name}
-          className="h-full w-full object-contain transition-transform duration-500 group-hover:scale-110"
-        />
+      
+      <Link to={`/product/${id}`} className="relative h-36 overflow-hidden bg-white p-2 block shrink-0">
+        <img src={imageUrl} alt={name} className="h-full w-full object-contain transition-transform duration-500 group-hover:scale-110" />
         
-        {/* Discount Badge */}
         {discount > 0 && (
-          <div className="absolute left-3 top-3 rounded-full bg-pink-600 px-2 py-1 text-xs font-bold text-white shadow-sm z-10">
+          <div className="absolute left-2 top-2 rounded-full bg-pink-600 px-1.5 py-0.5 text-[9px] font-bold text-white shadow-sm z-10">
             {discount}% OFF
           </div>
         )}
 
-        {/* Wishlist Button */}
-        <button
-          onClick={handleWishlist}
-          className="absolute right-3 top-3 rounded-full bg-gray-100/80 p-2 text-gray-500 backdrop-blur-sm transition-all hover:bg-pink-50 hover:text-pink-600 z-10"
-        >
-          <Heart size={18} />
+        <button onClick={(e) => { e.preventDefault(); handleWishlist(e); }} className="absolute right-2 top-2 rounded-full bg-gray-50/90 p-1.5 text-gray-500 backdrop-blur-sm transition-all hover:bg-pink-50 hover:text-pink-600 z-10">
+          <Heart size={14} />
         </button>
-      </div>
+      </Link>
 
-      {/* 2. Product Details Section */}
-      <CardContent className="p-4 flex-grow">
-        <div className="mb-2 flex items-center justify-between">
-          <span className="text-xs font-medium text-pink-600 uppercase tracking-wider bg-pink-50 px-2 py-1 rounded-md">
-            {category}
-          </span>
-          <div className="flex items-center gap-1 text-yellow-500">
-            <Star size={14} fill="currentColor" />
-            <span className="text-xs font-medium text-gray-600">4.5</span>
+     
+      <CardContent className="p-2.5 flex-grow flex flex-col justify-between border-t border-gray-50">
+        <div className="mb-1 flex items-center justify-between">
+          <span className="text-[9px] font-medium text-pink-600 uppercase tracking-wider bg-pink-50 px-1.5 py-0.5 rounded">{category}</span>
+          <div className="flex items-center gap-0.5 text-yellow-500">
+            <Star size={10} fill="currentColor" />
+            <span className="text-[10px] font-medium text-gray-600">4.5</span>
           </div>
         </div>
 
-        {/* Product Title */}
-        <h3 className="mb-2 line-clamp-2 text-sm font-semibold text-gray-800 leading-snug" title={name}>
-          {name}
-        </h3>
+        <Link to={`/product/${id}`}>
+        
+          <h3 className="line-clamp-2 text-xs font-semibold text-gray-800 leading-tight hover:text-pink-600 transition-colors" title={name}>{name}</h3>
+        </Link>
 
-        {/* Price Section */}
-        <div className="flex items-center gap-2 mt-auto pt-2">
-          <span className="text-xl font-bold text-gray-900">₹{price.toLocaleString('en-IN')}</span>
-          <span className="text-sm text-gray-400 line-through">
-            ₹{originalPrice.toLocaleString('en-IN')}
-          </span>
+        <div className="flex items-end gap-1.5 mt-1.5">
+          <span className="text-base font-bold text-gray-900 leading-none">₹{price.toLocaleString('en-IN')}</span>
+          <span className="text-[10px] text-gray-400 line-through leading-none mb-0.5">₹{originalPrice.toLocaleString('en-IN')}</span>
         </div>
       </CardContent>
 
-      {/* 3. Footer / Call to Action */}
-      <CardFooter className="p-4 pt-0">
-        <Button
-          onClick={handleAddToCart}
-          className="w-full bg-pink-600 text-white transition-all hover:bg-pink-700 hover:shadow-md"
-        >
-          <ShoppingCart size={18} className="mr-2" />
+      <CardFooter className="p-2.5 pt-0 shrink-0">
+       
+        <Button onClick={handleRealAddToCart} className="w-full h-8 text-xs font-medium bg-pink-600 text-white transition-all hover:bg-pink-700 hover:shadow-md">
+          <ShoppingCart size={14} className="mr-1.5" />
           Add to Cart
         </Button>
       </CardFooter>
